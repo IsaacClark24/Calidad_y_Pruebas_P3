@@ -2,7 +2,6 @@ package org.isaac.mucino.controller;
 
 import jakarta.validation.Valid;
 import org.isaac.mucino.model.LibroModel;
-import org.isaac.mucino.repository.LibroRepository;
 import org.isaac.mucino.service.LibroService;
 import org.springframework.web.bind.annotation.*;
 

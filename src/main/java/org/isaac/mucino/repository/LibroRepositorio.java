@@ -5,14 +5,13 @@ import com.google.cloud.firestore.*;
 import org.isaac.mucino.model.LibroModel;
 import org.springframework.stereotype.Repository;
 
-import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 @Repository
-public class LibroRepository {
+public class LibroRepositorio {
 
     private static final String COLLECTION = "libros";
 
