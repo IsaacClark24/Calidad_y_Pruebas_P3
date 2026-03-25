@@ -80,7 +80,7 @@ public class Biblioteca {
                     }else{
                         libroValido = libroTemporal;
                     }
-                    
+
                 } catch (Exception e) {
                     System.out.println("No Se Pudo Registrar El Libro Por El Error " + e + ". Vuelva A Intentarlo");
                 }

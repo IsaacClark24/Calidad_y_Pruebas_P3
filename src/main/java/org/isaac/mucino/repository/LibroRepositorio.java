@@ -94,4 +94,50 @@ public class LibroRepositorio {
             throw new RuntimeException("No Fue Posible Guardar El Libro Por El Error" + e);
         }
     }
+
+    public List<LibroModel> obtenerLibroPorTitulo(String titulo) {
+        try {
+            ApiFuture<QuerySnapshot> future = firestore.collection(COLLECTION)
+                    .whereEqualTo("titulo", titulo).get();
+            QuerySnapshot querySnapshot = future.get();
+            List<LibroModel> libros = new ArrayList<>();
+
+            for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                libros.add(new LibroModel(
+                        document.getId(),
+                        document.getString("titulo"),
+                        document.getString("autor"),
+                        document.getLong("edicion") != null ? Objects.requireNonNull(document.getLong("edicion")).intValue() : 0,
+                        document.getString("editorial"),
+                        document.getLong("anio") != null ? Objects.requireNonNull(document.getLong("anio")).intValue() : 0
+                ));
+            }
+            return libros;
+        } catch (Exception e) {
+            throw new RuntimeException("No Fue Posible Obtener Los Libros Por Título Debido Al Error: " + e.getMessage());
+        }
+    }
+
+    public List<LibroModel> obtenerLibroPorAutor(String autor) {
+        try {
+            ApiFuture<QuerySnapshot> future = firestore.collection(COLLECTION)
+                    .whereEqualTo("autor", autor).get();
+            QuerySnapshot querySnapshot = future.get();
+            List<LibroModel> libros = new ArrayList<>();
+
+            for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                libros.add(new LibroModel(
+                        document.getId(),
+                        document.getString("titulo"),
+                        document.getString("autor"),
+                        document.getLong("edicion") != null ? Objects.requireNonNull(document.getLong("edicion")).intValue() : 0,
+                        document.getString("editorial"),
+                        document.getLong("anio") != null ? Objects.requireNonNull(document.getLong("anio")).intValue() : 0
+                ));
+            }
+            return libros;
+        } catch (Exception e) {
+            throw new RuntimeException("No Fue Posible Obtener Los Libros Por Autor Debido Al Error: " + e.getMessage());
+        }
+    }
 }
