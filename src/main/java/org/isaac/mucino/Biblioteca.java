@@ -20,7 +20,7 @@ public class Biblioteca {
         ConfigurableApplicationContext contexto =
                 SpringApplication.run(Biblioteca.class, args);
         System.out.println("El Service Se Cerrara en 10 Segundos");
-        Thread.sleep(10000);
+        Thread.sleep(60000);
         System.out.println("Cerrando El Servicio");
         contexto.close();
     }
@@ -40,12 +40,37 @@ public class Biblioteca {
                     String titulo = scanner.nextLine();
                     System.out.println("Ingresa El Nombre Del Autor(es) Del Libro:");
                     String autor = scanner.nextLine();
-                    scanner = new Scanner(System.in);
-                    System.out.println("Ingresa El Anio De Publicacion Del Libro");
-                    String anioTexto = scanner.nextLine();
-                    int anio = Integer.parseInt(anioTexto);
-                    LibroModel libroTemporal = new LibroModel(null, titulo, autor, anio);
+
+                    int edicion = 0;
+                    while (true) {
+                        try {
+                            System.out.println("Ingresa El Número de Edición (1-20):");
+                            String edicionTexto = scanner.nextLine();
+                            edicion = Integer.parseInt(edicionTexto);
+                            break;
+                        } catch (NumberFormatException e) {
+                            System.out.println("Error: Ingresar un valor numérico para la edición.");
+                        }
+                    }
+
+                    System.out.println("Ingresa la Editorial:");
+                    String editorial = scanner.nextLine();
+
+                    int anio = 0;
+                    while (true) {
+                        try {
+                            System.out.println("Ingresa El Año De Publicación:");
+                            anio = Integer.parseInt(scanner.nextLine());
+                            break;
+                        } catch (NumberFormatException e) {
+                            System.out.println("Error: El año debe ser un valor numérico.");
+                        }
+                    }
+
+
+                    LibroModel libroTemporal = new LibroModel(null, titulo, autor, edicion, editorial, anio);
                     Set<ConstraintViolation<LibroModel>> constraintViolations = validator.validate(libroTemporal);
+
                     if(!constraintViolations.isEmpty()){
                         System.out.println("Se Encontraron Errores En Los Datos Ingresados:");
                         for (ConstraintViolation<LibroModel> constraintViolation : constraintViolations){
@@ -56,8 +81,6 @@ public class Biblioteca {
                         libroValido = libroTemporal;
                     }
 
-                } catch (NumberFormatException e) {
-                    System.out.println("El Anio Debe Ser Un Valor Numerico");
                 } catch (Exception e) {
                     System.out.println("No Se Pudo Registrar El Libro Por El Error " + e + ". Vuelva A Intentarlo");
                 }

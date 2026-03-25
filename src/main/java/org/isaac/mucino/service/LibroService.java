@@ -31,18 +31,20 @@ public class LibroService {
             throw new IllegalArgumentException(
                     "El Campo Libro No Puede Ser Nulo");
         }
-
-        boolean tituloAutorDuplicado = libroRepositorio.obtenerTodos().
-                stream().
-                anyMatch(libro ->
-                        libro.titulo().equalsIgnoreCase(libroModel.titulo())
-                                && libro.autor().equals(libroModel.autor())
-                );
-        if (tituloAutorDuplicado) {
-            throw new IllegalStateException("Ya Existe Un Libro Con Ese Titulo Y Autor");
-        }
-
         return libroRepositorio.guardar(libroModel);
     }
 
+    public List<LibroModel> obtenerLibrosPorTitulo(String titulo) {
+        if (titulo == null || titulo.isBlank()) {
+            throw new IllegalArgumentException("El título de búsqueda no puede estar vacío");
+        }
+        return libroRepositorio.obtenerLibroPorTitulo(titulo);
+    }
+
+    public List<LibroModel> obtenerLibrosPorAutor(String autor) {
+        if (autor == null || autor.isBlank()) {
+            throw new IllegalArgumentException("El nombre del autor no puede estar vacío");
+        }
+        return libroRepositorio.obtenerLibroPorAutor(autor);
+    }
 }

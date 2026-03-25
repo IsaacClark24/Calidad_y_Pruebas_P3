@@ -31,5 +31,13 @@ public class LibroController {
         return libroService.registrarLibro(libroModel);
     }
 
+    @GetMapping("/titulo/{titulo}")
+    public List<LibroModel> obtenerLibrosPorTitulo(@PathVariable String titulo){
+        return libroService.obtenerLibrosPorTitulo(titulo);
+    }
 
+    @GetMapping("/autor/{autor}")
+    public List<LibroModel> obtenerLibrosPorAutor(@PathVariable String autor){
+        return libroService.obtenerLibrosPorAutor(autor);
+    }
 }

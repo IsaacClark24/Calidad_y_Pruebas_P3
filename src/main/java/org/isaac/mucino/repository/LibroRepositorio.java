@@ -5,10 +5,7 @@ import com.google.cloud.firestore.*;
 import org.isaac.mucino.model.LibroModel;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 public class LibroRepositorio {
@@ -23,28 +20,25 @@ public class LibroRepositorio {
 
     public List<LibroModel> obtenerTodos(){
 
-        try{
+        try {
             ApiFuture<QuerySnapshot> future = firestore.collection(COLLECTION).get();
             QuerySnapshot querySnapshot = future.get();
             List<LibroModel> libros = new ArrayList<>();
 
-            for(DocumentSnapshot document: querySnapshot.getDocuments()){
-                LibroModel libro = document.toObject(LibroModel.class);
-
-                if(libro != null){
-                    libros.add(new LibroModel(
-                            document.getId(),
-                            libro.titulo(),
-                            libro.autor(),
-                            libro.anio()
-                    ));
-                }else{
-                    System.out.println("No Se Encontro Ningun El Libro");
-                }
+            for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                // Mapeo manual: extraemos cada campo y lo pasamos al constructor del Record
+                libros.add(new LibroModel(
+                        document.getId(),
+                        document.getString("titulo"),
+                        document.getString("autor"),
+                        document.getLong("edicion") != null ? Objects.requireNonNull(document.getLong("edicion")).intValue() : 0,
+                        document.getString("editorial"),
+                        document.getLong("anio") != null ? Objects.requireNonNull(document.getLong("anio")).intValue() : 0
+                ));
             }
             return libros;
         } catch (Exception e) {
-            throw new RuntimeException("No Fue Posible Obtener Los Libros Por El Error"+ e);
+            throw new RuntimeException("No Fue Posible Obtener Los Libros Por El Error: " + e.getMessage());
         }
     }
 
@@ -56,23 +50,20 @@ public class LibroRepositorio {
             ApiFuture<DocumentSnapshot> future = documentReference.get();
             DocumentSnapshot document = future.get();
 
-            if(document.exists()){
-                LibroModel libro = document.toObject(LibroModel.class);
-
-                if(libro != null){
-                    return Optional.of(new LibroModel(
-                            document.getId(),
-                            libro.titulo(),
-                            libro.autor(),
-                            libro.anio()
-                    ));
-                }else{
-                    System.out.println("No Se Encontro Ningun El Libro Con El Id " + id);
-                }
+            if (document.exists()) {
+                // Retornamos el LibroModel construido manualmente con los datos de Firebase
+                return Optional.of(new LibroModel(
+                        document.getId(),
+                        document.getString("titulo"),
+                        document.getString("autor"),
+                        document.getLong("edicion") != null ? Objects.requireNonNull(document.getLong("edicion")).intValue() : 0,
+                        document.getString("editorial"),
+                        document.getLong("anio") != null ? Objects.requireNonNull(document.getLong("anio")).intValue() : 0
+                ));
             }
             return Optional.empty();
         } catch (Exception e) {
-            throw new RuntimeException("No Fue Posible Obtener El Libro Con El Id " + id + " Por El Error "+e);
+            throw new RuntimeException("No Fue Posible Obtener El Libro Con El Id " + id + " Por El Error: " + e.getMessage());
         }
     }
 
@@ -83,6 +74,8 @@ public class LibroRepositorio {
             ApiFuture<WriteResult> future = documentReference.set(Map.of(
                     "titulo", libro.titulo(),
                     "autor", libro.autor(),
+                    "edicion", libro.edicion(),
+                    "editorial", libro.editorial(),
                     "anio", libro.anio()
             ));
 
@@ -92,11 +85,59 @@ public class LibroRepositorio {
                     documentReference.getId(),
                     libro.titulo(),
                     libro.autor(),
+                    libro.edicion(),
+                    libro.editorial(),
                     libro.anio()
             );
 
         } catch (Exception e) {
             throw new RuntimeException("No Fue Posible Guardar El Libro Por El Error" + e);
+        }
+    }
+
+    public List<LibroModel> obtenerLibroPorTitulo(String titulo) {
+        try {
+            ApiFuture<QuerySnapshot> future = firestore.collection(COLLECTION)
+                    .whereEqualTo("titulo", titulo).get();
+            QuerySnapshot querySnapshot = future.get();
+            List<LibroModel> libros = new ArrayList<>();
+
+            for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                libros.add(new LibroModel(
+                        document.getId(),
+                        document.getString("titulo"),
+                        document.getString("autor"),
+                        document.getLong("edicion") != null ? Objects.requireNonNull(document.getLong("edicion")).intValue() : 0,
+                        document.getString("editorial"),
+                        document.getLong("anio") != null ? Objects.requireNonNull(document.getLong("anio")).intValue() : 0
+                ));
+            }
+            return libros;
+        } catch (Exception e) {
+            throw new RuntimeException("No Fue Posible Obtener Los Libros Por Título Debido Al Error: " + e.getMessage());
+        }
+    }
+
+    public List<LibroModel> obtenerLibroPorAutor(String autor) {
+        try {
+            ApiFuture<QuerySnapshot> future = firestore.collection(COLLECTION)
+                    .whereEqualTo("autor", autor).get();
+            QuerySnapshot querySnapshot = future.get();
+            List<LibroModel> libros = new ArrayList<>();
+
+            for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                libros.add(new LibroModel(
+                        document.getId(),
+                        document.getString("titulo"),
+                        document.getString("autor"),
+                        document.getLong("edicion") != null ? Objects.requireNonNull(document.getLong("edicion")).intValue() : 0,
+                        document.getString("editorial"),
+                        document.getLong("anio") != null ? Objects.requireNonNull(document.getLong("anio")).intValue() : 0
+                ));
+            }
+            return libros;
+        } catch (Exception e) {
+            throw new RuntimeException("No Fue Posible Obtener Los Libros Por Autor Debido Al Error: " + e.getMessage());
         }
     }
 }
